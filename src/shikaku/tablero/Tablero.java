@@ -72,7 +72,7 @@ public class Tablero {
 						break;
 					}
 				}
-				if (!colisiones || idx == 0) {
+				if (!colisiones) {
 					// si no ha colisionado con ninguno de los anteriores, se sigue en profundidad
 					res[idx] = i;
 					buscaSoluciones(llc, res, idx+1);
@@ -83,7 +83,9 @@ public class Tablero {
 			for (int i=0; i<idx; i++) {
 				lc.add(llc.get(i).get(res[i]));
 			}
-			soluciones = new LinkedList<List<Combinacion>>();
+			if (soluciones == null) {
+				soluciones = new LinkedList<List<Combinacion>>();
+			}
 			soluciones.add(lc);
 		}
 	}
@@ -118,20 +120,20 @@ public class Tablero {
 					boolean colision = false;
 					for (int k=0; k<fijos.size(); k++) {
 						if (fijos.get(k).colision(o)) {
-							System.out.printf("%02d ", fijos.get(k).getNum());
+							System.out.printf("%3d ", fijos.get(k).getNum());
 							colision = true;
 							break;
 						}
 					}
 					for (int k=0; k<slc.size() && !colision; k++) {
 						if (slc.get(k).colision(o)) {
-							System.out.printf("%02d ", slc.get(k).getNum());
+							System.out.printf("%3d ", slc.get(k).getNum());
 							colision = true;
 							break;
 						}
 					}
 					if (!colision) {
-						System.out.print(" X ");
+						System.out.print("  X ");
 					}
 				}
 				System.out.print("\n");

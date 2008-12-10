@@ -83,6 +83,38 @@ public class Combinacion {
 	}
 	
 	public static void depuradora( List<Combinacion> fijos, Heap<List<Combinacion>> llc ) {
+		// eliminamos las combinaciones que "colisionen" con todas las combinaciones
+		// de un bloque específico.
+		boolean colisiones;
+		do {
+			colisiones = false;
+			for (int i=0; i<llc.size(); i++) {
+				for (int j=0; j<llc.get(i).size(); j++) {
+					for (int k=0; k<llc.size(); k++) {
+						if (i != k) {
+							int colision = 0;
+							int l;
+							for (l=0; l<llc.get(k).size(); l++) {
+								if (llc.get(i).get(j).colision(llc.get(k).get(l))) {
+									colision ++;
+								}
+							}
+							if (colision == l) {
+								llc.get(i).remove(j);
+								if (j >= llc.get(i).size()) {
+									j--;
+								}
+								colisiones = true;
+							}
+						}
+					}
+				}
+			}
+		} while (colisiones);
+		llc.sort();
+		
+		// ponemos como bloques fijos los que tengan una sola combinacion,
+		// así como descartaremos los que "colisionen" con ellos en el tablero.
 		while (llc.size() > 0 && llc.get(0).size() == 1) {
 			Combinacion fijo = llc.get(0).get(0);
 			llc.remove(0);

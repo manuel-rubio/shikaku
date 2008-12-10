@@ -65,11 +65,11 @@ public class shikaku {
 						lch.add(new Integer(0));
 						ins = true;
 						if (debug) {
-							System.out.print(" *");
+							System.out.print("  *");
 						}
 					} else if (linea.charAt(i) >= '0' && linea.charAt(i) <= '9') {
 						Integer n = new Integer(linea.charAt(i) - '0');
-						if (linea.length() > i+1 && linea.charAt(i+1) >= '0' && linea.charAt(i+1) <= '9') {
+						while (linea.length() > i+1 && linea.charAt(i+1) >= '0' && linea.charAt(i+1) <= '9') {
 							i++;
 							n *= 10;
 							n += linea.charAt(i) - '0';
@@ -79,7 +79,7 @@ public class shikaku {
 						lch.add(n);
 						ins = true;
 						if (debug) {
-							System.out.printf("%02d", n);
+							System.out.printf("%3d", n);
 						}
 					}
 				}
