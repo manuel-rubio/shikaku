@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import shikaku.tablero.Combinacion;
+import shikaku.tablero.Log;
 import shikaku.tablero.Tablero;
 import shikaku.tablero.Heap;
 import shikaku.tablero.Ordenada;
@@ -37,12 +38,12 @@ public class shikaku {
 				"\tfichero analiza un fichero de tablero y sus soluciones.\n";
 	}
 	
-	private static void run( InputStream is, boolean debug ) throws IOException {
+	private static void run( InputStream is ) throws IOException {
 		InputStreamReader isr = new InputStreamReader(is);
 		BufferedReader bf = new BufferedReader(isr);
 		boolean ins = false;
 		Heap<List<Combinacion>> lc = new Heap<List<Combinacion>>();
-		Tablero t = new Tablero(debug);
+		Tablero t = new Tablero();
 		List<List<Integer>> tch = new ArrayList<List<Integer>>();
 		List<Ordenada> puntos = new ArrayList<Ordenada>();
 		int suma = 0;
@@ -64,9 +65,7 @@ public class shikaku {
 					if (linea.charAt(i) == '*') {
 						lch.add(new Integer(0));
 						ins = true;
-						if (debug) {
-							System.out.print("  *");
-						}
+						Log.print(Log.TYPE_DEBUG, "  *");
 					} else if (linea.charAt(i) >= '0' && linea.charAt(i) <= '9') {
 						Integer n = new Integer(linea.charAt(i) - '0');
 						while (linea.length() > i+1 && linea.charAt(i+1) >= '0' && linea.charAt(i+1) <= '9') {
@@ -78,29 +77,23 @@ public class shikaku {
 						puntos.add(new Ordenada(lch.size(), tch.size()));
 						lch.add(n);
 						ins = true;
-						if (debug) {
-							System.out.printf("%3d", n);
-						}
+						Log.print(Log.TYPE_DEBUG, String.format("%3d", n));
 					}
 				}
 				if (ins) {
 					tch.add(lch);
 				}
-				if (debug) {
-					System.out.print('\n');
-				}
+				Log.print(Log.TYPE_DEBUG, "\n");
 			}
 		} while (bf.ready());
 		
 		int ysize = tch.size();
 		int xsize = tch.get(0).size();
-		
-		if (debug) {
-			System.out.printf("Tamaño: %d x %d\n", xsize, ysize);
-		}
+
+		Log.print(Log.TYPE_DEBUG, String.format("Tamaño: %d x %d\n", xsize, ysize));
 		
 		if (suma != (xsize * ysize)) {
-			System.out.println("Tablero imposible de resolver.");
+			Log.print("Tablero imposible de resolver.\n");
 			return;
 		}
 		
@@ -116,11 +109,11 @@ public class shikaku {
 			}
 		}
 
-		if (debug) {
-			System.out.println("Combinaciones por pieza: ");
+		if (Log.isDebugging()) {
+			Log.print(Log.TYPE_DEBUG, "Combinaciones por pieza: \n");
 			Iterator<List<Combinacion>> ilc = lc.iterator();
 			for (int i=0; ilc.hasNext(); i++) {
-				System.out.println(i + " -> " + ilc.next().size());
+				Log.print(Log.TYPE_DEBUG, i + " -> " + ilc.next().size() + "\n");
 			}
 		}
 		
@@ -135,36 +128,36 @@ public class shikaku {
 	 * @param args
 	 */
 	public static void main(String[] args) throws IOException {
-				
-		boolean debug = false;
-		
+
+		boolean ayuda = false;
+		InputStream is = null;
+
 		// comprobamos si hay información en la entrada estándar
 		if (System.in.available() > 0) {
 			// hay información en la entrada estándar
-			for (int i=0; i<args.length; i++) {
-				if (args[i].equals("-d")) {
-					debug = true;
-				}
-			}
-			run(System.in, debug);
-		} else {
-			for (int i = 0; i < args.length; i++) {
-				if (args[i].equals("-h")) {
-					// presenta ayuda y sale del programa
-					System.out.println(shikaku.help());
-					return;
-				} else if (args[i].equals("-d")) {
-					debug = true;
-				} else {
+			is = System.in;
+		}
+		for (int i = 0; i < args.length; i++) {
+			if (args[i].equals("-h")) {
+				// presenta ayuda y sale del programa
+				ayuda = true;
+			} else if (args[i].equals("-d")) {
+				Log.setDebug();
+			} else {
+				if (is == null) {
 					try {
-						FileInputStream fin = new FileInputStream(args[i]);
-						run(fin, debug);
+						is = new FileInputStream(args[i]);
 					} catch (FileNotFoundException ex) {
-						System.out.println("Fichero no válido o no encontrado.");
-						System.out.println(shikaku.help());
+						Log.print("Fichero no válido o no encontrado.\n" + shikaku.help() + "\n");
 					}
 				}
 			}
+		}
+		if (ayuda) {
+			Log.print(shikaku.help() + "\n");
+		}
+		if (is != null) {
+			run(is);
 		}
 	}
 

@@ -34,7 +34,7 @@
 	</target>
 
 	<target name="clean">
-		<delete dir="${bin}" />
+		<delete dir="${build}" />
 		<delete dir="${dist}" />
 	</target>
 

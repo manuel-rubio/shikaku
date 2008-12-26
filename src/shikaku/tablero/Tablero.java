@@ -4,49 +4,79 @@ import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Almacena el tamaño del tablero, las combinaciones fijas y la lista de soluciones.
+ *  
+ * @author Manuel Rubio
+ *
+ * @see Combinacion
+ */
 public class Tablero {
 
 	private int xsize;
 	private int ysize;
-	private boolean debug;
 	
 	private List<List<Combinacion>> soluciones;
 	private List<Combinacion> fijos;
-	
-	public Tablero( boolean debug ) {
+
+	/**
+	 * Constructor que inicializa las variables del objeto.
+	 */
+	public Tablero() {
 		xsize = ysize = 0;
 		soluciones = null;
-		this.debug = debug;
 	}
 	
-	public Tablero( int xsize, int ysize, boolean debug ) {
+	/**
+	 * Constructor que inicializa las variables del objeto, pasando
+	 * el tamaño del tablero.
+	 * @param xsize tamaño del tablero en el eje X.
+	 * @param ysize tamaño del tablero en el eje Y.
+	 */
+	public Tablero( int xsize, int ysize ) {
 		this.xsize = xsize;
 		this.ysize = ysize;
 		this.soluciones = null;
-		this.debug = debug;
 	}
 	
+	/**
+	 * Configura el tamaño del tablero.
+	 * @param xsize tamaño del tablero en el eje X.
+	 * @param ysize tamaño del tablero en el eje Y.
+	 */
 	public void setSize( int xsize, int ysize ) {
 		this.xsize = xsize;
 		this.ysize = ysize;
 	}
-	
+
+	/**
+	 * Lanza el proceso de búsqueda de soluciones, mediante un
+	 * algoritmo heurístico, de vuelta atrás.
+	 * @param llc lista de combinaciones.
+	 */
 	public void buscaSoluciones( Heap<List<Combinacion>> llc ) {
 		fijos = new ArrayList<Combinacion>();
 		Combinacion.depuradora(fijos, llc);
 		int [] res = new int[llc.size()];
 		
-		if (debug) {
-			System.out.println("Combinaciones por pieza (después de la depuradora): ");
+		if (Log.isDebugging()) {
+			Log.print(Log.TYPE_DEBUG, "Combinaciones por pieza (después de la depuradora): \n");
 			Iterator<List<Combinacion>> ilc = llc.iterator();
 			for (int i=0; ilc.hasNext(); i++) {
-				System.out.println(i + " -> " + ilc.next().size());
+				Log.print(Log.TYPE_DEBUG, i + " -> " + ilc.next().size() + "\n");
 			}
 		}
 		
 		buscaSoluciones(llc, res, 0);
 	}
 	
+	/**
+	 * método recursivo para la búsqueda de soluciones mediante el método de
+	 * vuelta atrás.
+	 * @param llc montículo con lista de combinaciones por cada número.
+	 * @param res array de soluciones.
+	 * @param idx índice que indica el número que se está comprobando.
+	 */
 	private void buscaSoluciones( List<List<Combinacion>> llc, int[] res, int idx ) {
 		if (idx < res.length) {
 			// tomamos el iterador del bloque de combinaciones que toque
@@ -90,29 +120,35 @@ public class Tablero {
 		}
 	}
 
+	/**
+	 * imprime por pantallas todas las soluciones almacenadas.
+	 */
 	public void render() {
 		for (int i=0; i<soluciones.size(); i++) {
-			System.out.println("## Solución: " + (i + 1));
+			Log.print("## Solución: " + (i + 1) + "\n");
 			render(i);
-			System.out.println("##");
+			Log.print("##\n");
 		}
-		System.out.printf("Soluciones: %d\n", soluciones.size());
+		Log.print("Soluciones: " + soluciones.size() + "\n");
 	}
 
+	/**
+	 * imprime por pantalla la solución pasada como parámetro.
+	 * @param solucion índice de la solución a presentar.
+	 */
 	public void render( int solucion ) {
 		if (soluciones.size() == 0) {
-			System.out.println("Tablero sin soluciones.");
+			Log.print("Tablero sin soluciones.\n");
 		} else if (solucion < 0 || solucion >= soluciones.size()) {
-			System.out.println("Solución " + solucion + " no válida. Hay " + soluciones.size() + " solucion(es)");
+			Log.print("Solución " + solucion + " no válida. Hay " + soluciones.size() + " solucion(es)\n");
 		} else {
 			List<Combinacion> slc = soluciones.get(solucion);
-			if (debug) {
-				System.out.printf("Size: %d x %d\n", xsize, ysize);
-				System.out.print("OK: ");
+			if (Log.isDebugging()) {
+				Log.print(Log.TYPE_DEBUG, "Size: " + xsize + " x " + ysize + "\nOK: ");
 				for (int i=0; i<slc.size(); i++) {
-					System.out.print(slc.get(i) + " ");
+					Log.print(Log.TYPE_DEBUG, slc.get(i) + " ");
 				}
-				System.out.print('\n');
+				Log.print(Log.TYPE_DEBUG, "\n");
 			}
 			for (int i=0; i<this.ysize; i++) {
 				for (int j=0; j<this.xsize; j++) {
@@ -120,23 +156,23 @@ public class Tablero {
 					boolean colision = false;
 					for (int k=0; k<fijos.size(); k++) {
 						if (fijos.get(k).colision(o)) {
-							System.out.printf("%3d ", fijos.get(k).getNum());
+							Log.print(String.format("%3d ", fijos.get(k).getNum()));
 							colision = true;
 							break;
 						}
 					}
 					for (int k=0; k<slc.size() && !colision; k++) {
 						if (slc.get(k).colision(o)) {
-							System.out.printf("%3d ", slc.get(k).getNum());
+							Log.print(String.format("%3d ", slc.get(k).getNum()));
 							colision = true;
 							break;
 						}
 					}
 					if (!colision) {
-						System.out.print("  X ");
+						Log.print("  X ");
 					}
 				}
-				System.out.print("\n");
+				Log.print("\n");
 			}
 		}
 	}
