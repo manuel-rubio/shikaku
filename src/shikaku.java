@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import shikaku.tablero.Combinacion;
@@ -43,8 +43,8 @@ public class shikaku {
 		boolean ins = false;
 		Heap<List<Combinacion>> lc = new Heap<List<Combinacion>>();
 		Tablero t = new Tablero(debug);
-		List<List<Integer>> tch = new LinkedList<List<Integer>>();
-		List<Ordenada> puntos = new LinkedList<Ordenada>();
+		List<List<Integer>> tch = new ArrayList<List<Integer>>();
+		List<Ordenada> puntos = new ArrayList<Ordenada>();
 		int suma = 0;
 
 		// criterio de ordenación para el montículo
@@ -56,7 +56,7 @@ public class shikaku {
 
 		// leemos los datos de entrada o de fichero
 		do {
-			List<Integer> lch = new LinkedList<Integer>();
+			List<Integer> lch = new ArrayList<Integer>();
 			String linea = bf.readLine().trim();
 			
 			if (linea.length() > 0 && linea.charAt(0) != '#') { 

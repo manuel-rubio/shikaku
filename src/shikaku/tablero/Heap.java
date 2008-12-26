@@ -1,9 +1,9 @@
 package shikaku.tablero;
 
 import java.util.Comparator;
-import java.util.LinkedList;
+import java.util.ArrayList;
 
-public class Heap<E> extends LinkedList<E> {
+public class Heap<E> extends ArrayList<E> {
 	
 	Comparator<E> comparator;
 	
@@ -31,9 +31,13 @@ public class Heap<E> extends LinkedList<E> {
 		Heap<E> tmp = new Heap<E>();
 		tmp.addAll(this);
 		this.clear();
-		while (tmp.size() > 0) {
-			E dato = tmp.poll();
+		for (int i=0; i<tmp.size(); i++) {
+			E dato = tmp.get(i);
 			this.add(dato);
 		}
+//		while (tmp.size() > 0) {
+//			E dato = tmp..poll();
+//			this.add(dato);
+//		}
 	}
 }

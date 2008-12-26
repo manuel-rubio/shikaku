@@ -1,7 +1,7 @@
 package shikaku.tablero;
 
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Tablero {
@@ -32,7 +32,7 @@ public class Tablero {
 	}
 	
 	public void buscaSoluciones( Heap<List<Combinacion>> llc ) {
-		fijos = new LinkedList<Combinacion>();
+		fijos = new ArrayList<Combinacion>();
 		Combinacion.depuradora(fijos, llc);
 		int [] res = new int[llc.size()];
 		
@@ -79,12 +79,12 @@ public class Tablero {
 				}
 			}
 		} else {
-			List<Combinacion> lc = new LinkedList<Combinacion>();
+			List<Combinacion> lc = new ArrayList<Combinacion>();
 			for (int i=0; i<idx; i++) {
 				lc.add(llc.get(i).get(res[i]));
 			}
 			if (soluciones == null) {
-				soluciones = new LinkedList<List<Combinacion>>();
+				soluciones = new ArrayList<List<Combinacion>>();
 			}
 			soluciones.add(lc);
 		}

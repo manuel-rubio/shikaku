@@ -1,7 +1,7 @@
 package shikaku.tablero;
 
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Combinacion {
@@ -45,37 +45,17 @@ public class Combinacion {
 	}
 
 	public boolean colision(Combinacion c) {
-		if (x1 <= c.x1 && x2 >= c.x1 && y1 <= c.y1
-				&& y2 >= c.y1) {
-			return true;
-		}
-		if (x1 <= c.x2 && x2 >= c.x2 && y1 <= c.y2
-				&& y2 >= c.y2) {
-			return true;
-		}
-		if (x1 >= c.x1 && x1 <= c.x2 && c.y1 >= y1 && c.y1 <= y2) {
-			return true;
-		}
-		if (c.x1 <= x1 && c.x2 >= x1 && c.y1 <= y1
-				&& c.y2 >= y1) {
-			return true;
-		}
-		if (c.x1 <= x2 && c.x2 >= x2 && c.y1 <= y2
-				&& c.y2 >= y2) {
-			return true;
-		}
-		if (c.x1 >= x1 && c.x1 <= x2 && y1 >= c.y1 && y1 <= c.y2) {
-			return true;
-		}
-		return false;
+		return (x1 <= c.x1 && x2 >= c.x1 && y1 <= c.y1 && y2 >= c.y1) ||
+			   (x1 <= c.x2 && x2 >= c.x2 && y1 <= c.y2 && y2 >= c.y2) ||
+			   (x1 >= c.x1 && x1 <= c.x2 && c.y1 >= y1 && c.y1 <= y2) ||
+			   (c.x1 <= x1 && c.x2 >= x1 && c.y1 <= y1 && c.y2 >= y1) ||
+			   (c.x1 <= x2 && c.x2 >= x2 && c.y1 <= y2 && c.y2 >= y2) ||
+			   (c.x1 >= x1 && c.x1 <= x2 && y1 >= c.y1 && y1 <= c.y2);
 	}
 	
 	public boolean colision(Ordenada o) {
-		if (o.getX() >= this.x1 && o.getX() <= this.x2
-				&& o.getY() >= this.y1 && o.getY() <= this.y2) {
-			return true;
-		}
-		return false;
+		return (o.getX() >= this.x1 && o.getX() <= this.x2
+				&& o.getY() >= this.y1 && o.getY() <= this.y2);
 	}
 	
 	public int getNum() {
@@ -111,23 +91,14 @@ public class Combinacion {
 				}
 			}
 		} while (colisiones);
-		llc.sort();
 		
 		// ponemos como bloques fijos los que tengan una sola combinacion,
 		// así como descartaremos los que "colisionen" con ellos en el tablero.
+		llc.sort();
 		while (llc.size() > 0 && llc.get(0).size() == 1) {
 			Combinacion fijo = llc.get(0).get(0);
 			llc.remove(0);
 			fijos.add(fijo);
-			for (int i=0; i < llc.size(); i++) {
-				for (int j=0; j < llc.get(i).size(); j++) {
-					if (llc.get(i).get(j).colision(fijo)) {
-						llc.get(i).remove(j);
-						j--;
-					}
-				}
-			}
-			llc.sort();
 		}
 	}
 	
@@ -154,7 +125,7 @@ public class Combinacion {
 							}
 							if (!colision) {
 								if (result == null) {
-									result = new LinkedList<Combinacion>();
+									result = new ArrayList<Combinacion>();
 								}
 								result.add(c1);
 							}
