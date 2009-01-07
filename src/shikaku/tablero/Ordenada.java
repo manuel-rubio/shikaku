@@ -10,12 +10,13 @@ public class Ordenada {
 
 	private int x;
 	private int y;
+	private int n;
 	
 	/**
 	 * Inicializa las variables internas.
 	 */
 	public Ordenada() {
-		x = y = 0;
+		x = y = n = 0;
 	}
 	
 	/**
@@ -29,6 +30,18 @@ public class Ordenada {
 	}
 	
 	/**
+	 * Inicializa las variables internas con un valor pasado como parámetro.
+	 * @param x valor del eje X.
+	 * @param y valor del eje Y.
+	 * @param n peso de la coordenada.
+	 */
+	public Ordenada( int x, int y, int n ) {
+		this.x = x;
+		this.y = y;
+		this.n = n;
+	}
+	
+	/**
 	 * Da los valores específicos a las ordenadas del objeto.
 	 * @param x valor del eje X.
 	 * @param y valor del eje Y.
@@ -36,6 +49,18 @@ public class Ordenada {
 	public void set( int x, int y ) {
 		this.x = x;
 		this.y = y;
+	}
+	
+	/**
+	 * Da los valores específicos a las ordenadas del objeto.
+	 * @param x valor del eje X.
+	 * @param y valor del eje Y.
+	 * @param n peso de la coordenada.
+	 */
+	public void set( int x, int y, int n ) {
+		this.x = x;
+		this.y = y;
+		this.n = n;
 	}
 	
 	/**
@@ -53,26 +78,45 @@ public class Ordenada {
 	public int getY() {
 		return y;
 	}
+	
+	/**
+	 * Retorna valor del peso del punto (X,Y).
+	 * @return valor del peso.
+	 */
+	public int getNum() {
+		return n;
+	}
 
 	/**
 	 * Retorna la ordenada formateada en una cadena de texto.
 	 * @return cadena de texto.
 	 */
 	public String toString() {
+		if (this.n > 0) {
+			return "(" + x + "," + y + ")" + "[" + n + "]";
+		}
 		return "(" + x + "," + y + ")";
 	}
 	
 	/**
 	 * Indica si los datos de la ordenada pasada en forma X e Y,
-	 * es igual a la ordenada almacenada en el objeto.
+	 * son iguales a la ordenada almacenada en el objeto.
 	 * @param x valor del eje X.
 	 * @param y valor del eje Y.
 	 * @return verdadero si los parámetros pasados son iguales a los almacenados. Falso en caso contrario.
 	 */
 	public boolean equals( int x, int y ) {
-		if (this.x == x && this.y == y) {
-			return true;
-		}
-		return false;
+		return (this.x == x && this.y == y);
 	}
+	
+	/**
+	 * Indica si los datos de la ordenada pasada,
+	 * son iguales a la ordenada almacenada en el objeto.
+	 * @param o Ordenada a comparar.
+	 * @return verdadero si los parámetros pasados son iguales a los almacenados. Falso en caso contrario.
+	 */
+	public boolean equals( Ordenada o ) {
+		return (this.x == o.x && this.y == o.y);
+	}
+
 }

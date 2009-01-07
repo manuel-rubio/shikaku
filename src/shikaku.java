@@ -24,6 +24,14 @@ import shikaku.tablero.Ordenada;
  */
 
 public class shikaku {
+	
+	private List<Ordenada> puntos;
+	private int xsize, ysize; 
+	
+	public shikaku() {
+		puntos = new ArrayList<Ordenada>();
+		xsize = ysize = 0;
+	}
 
 	private static String help() {
 		return
@@ -38,24 +46,19 @@ public class shikaku {
 				"\tfichero analiza un fichero de tablero y sus soluciones.\n";
 	}
 	
-	private static void run( InputStream is ) throws IOException {
+	/**
+	 * Lee los datos de la entrada pasada como parámetro, almacenando los puntos
+	 * encontrados en el tablero, 
+	 * @param is
+	 * @throws IOException
+	 */
+	private void leeEntrada( InputStream is ) throws IOException {
 		InputStreamReader isr = new InputStreamReader(is);
 		BufferedReader bf = new BufferedReader(isr);
-		boolean ins = false;
-		Heap<List<Combinacion>> lc = new Heap<List<Combinacion>>();
-		Tablero t = new Tablero();
 		List<List<Integer>> tch = new ArrayList<List<Integer>>();
-		List<Ordenada> puntos = new ArrayList<Ordenada>();
+		boolean ins = false;
 		int suma = 0;
-
-		// criterio de ordenación para el montículo
-		lc.setComparator(new Comparator<List<Combinacion>>() {
-			public int compare( List<Combinacion> lc1, List<Combinacion> lc2 ) {
-				return lc1.size() - lc2.size();
-			}
-		});
-
-		// leemos los datos de entrada o de fichero
+		
 		do {
 			List<Integer> lch = new ArrayList<Integer>();
 			String linea = bf.readLine().trim();
@@ -65,7 +68,7 @@ public class shikaku {
 					if (linea.charAt(i) == '*') {
 						lch.add(new Integer(0));
 						ins = true;
-						Log.print(Log.TYPE_DEBUG, "  *");
+						Log.print(Log.TYPE_DEBUG, "   *");
 					} else if (linea.charAt(i) >= '0' && linea.charAt(i) <= '9') {
 						Integer n = new Integer(linea.charAt(i) - '0');
 						while (linea.length() > i+1 && linea.charAt(i+1) >= '0' && linea.charAt(i+1) <= '9') {
@@ -74,10 +77,10 @@ public class shikaku {
 							n += linea.charAt(i) - '0';
 						}
 						suma += n.intValue();
-						puntos.add(new Ordenada(lch.size(), tch.size()));
+						puntos.add(new Ordenada(lch.size(), tch.size(), n.intValue()));
 						lch.add(n);
 						ins = true;
-						Log.print(Log.TYPE_DEBUG, String.format("%3d", n));
+						Log.print(Log.TYPE_DEBUG, String.format("%4d", n));
 					}
 				}
 				if (ins) {
@@ -87,28 +90,40 @@ public class shikaku {
 			}
 		} while (bf.ready());
 		
-		int ysize = tch.size();
-		int xsize = tch.get(0).size();
-
+		ysize = tch.size();
+		xsize = tch.get(0).size();
+		
 		Log.print(Log.TYPE_DEBUG, String.format("Tamaño: %d x %d\n", xsize, ysize));
 		
 		if (suma != (xsize * ysize)) {
 			Log.print("Tablero imposible de resolver.\n");
-			return;
+			System.exit(0);
 		}
-		
-		// agregamos las combinaciones generadas a la lista de combinaciones
-		Iterator<List<Integer>> ili = tch.iterator();
-		for (int i=0; ili.hasNext(); i++) {
-			Iterator<Integer> ii = ili.next().iterator();
-			for (int j=0; ii.hasNext(); j++) {
-				int n = ii.next();
-				if (n > 0) {
-					lc.add(Combinacion.generador(j, i, n, xsize, ysize, puntos));
-				}
+	}
+	
+	/**
+	 * Se encarga de la ejecución del algoritmo para la búsqueda de combinaciones,
+	 * la resolución y presentación del tablero.
+	 */
+	private void run() {
+		Heap<List<Combinacion>> lc = new Heap<List<Combinacion>>();
+		Tablero t = new Tablero();
+
+		// criterio de ordenación para el montículo
+		lc.setComparator(new Comparator<List<Combinacion>>() {
+			public int compare( List<Combinacion> lc1, List<Combinacion> lc2 ) {
+				return lc1.size() - lc2.size();
 			}
+		});
+
+		// agregamos las combinaciones generadas a la lista de combinaciones
+		Iterator<Ordenada> ilo = puntos.iterator();
+		while (ilo.hasNext()) {
+			Ordenada o = ilo.next();
+			lc.add(Combinacion.generador(o.getX(), o.getY(), o.getNum(), xsize, ysize, puntos));
 		}
 
+		// imprimimos las combinaciones por pieza (en caso de depuración)
 		if (Log.isDebugging()) {
 			Log.print(Log.TYPE_DEBUG, "Combinaciones por pieza: \n");
 			Iterator<List<Combinacion>> ilc = lc.iterator();
@@ -117,6 +132,7 @@ public class shikaku {
 			}
 		}
 		
+		// resolvemos y presentamos las soluciones del tablero
 		t.setSize(xsize, ysize);
 		t.buscaSoluciones(lc);
 		t.render();
@@ -139,7 +155,6 @@ public class shikaku {
 		}
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-h")) {
-				// presenta ayuda y sale del programa
 				ayuda = true;
 			} else if (args[i].equals("-d")) {
 				Log.setDebug();
@@ -148,7 +163,7 @@ public class shikaku {
 					try {
 						is = new FileInputStream(args[i]);
 					} catch (FileNotFoundException ex) {
-						Log.print("Fichero no válido o no encontrado.\n" + shikaku.help() + "\n");
+						Log.print("Fichero no válido o no encontrado.\n\n" + shikaku.help() + "\n");
 					}
 				}
 			}
@@ -157,7 +172,9 @@ public class shikaku {
 			Log.print(shikaku.help() + "\n");
 		}
 		if (is != null) {
-			run(is);
+			shikaku s = new shikaku();
+			s.leeEntrada(is);
+			s.run();
 		}
 	}
 
