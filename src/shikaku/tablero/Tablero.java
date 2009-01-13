@@ -85,21 +85,12 @@ public class Tablero {
 				// tomamos la combinación que toque combinar
 				Combinacion c = ic.next();
 				boolean colisiones = false;
-				Iterator<Combinacion> ifijo = fijos.iterator();
-				while (ifijo.hasNext()) {
-					Combinacion fijo = ifijo.next();
-					if (c.colision(fijo)) {
-						colisiones = true;
-						break;
-					}
-				}
 				for (int j=0; j<idx && !colisiones; j++) {
 					// tomamos una de las combinaciones almacenadas con anterioridad
 					Combinacion tc = llc.get(j).get(res[j]);
 					if (c.colision(tc)) {
 						// si se colisionó, se poda
 						colisiones = true;
-						break;
 					}
 				}
 				if (!colisiones) {
