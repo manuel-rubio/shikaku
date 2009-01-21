@@ -67,7 +67,7 @@ public class Tablero {
 			}
 		}
 		
-		buscaSoluciones(llc, res, 0);
+		buscaSolucionesRec(llc, res, 0);
 	}
 	
 	/**
@@ -77,7 +77,7 @@ public class Tablero {
 	 * @param res array de soluciones.
 	 * @param idx índice que indica el número que se está comprobando.
 	 */
-	private void buscaSoluciones( List<List<Combinacion>> llc, int[] res, int idx ) {
+	private void buscaSolucionesRec( List<List<Combinacion>> llc, int[] res, int idx ) {
 		if (idx < res.length) {
 			// tomamos el iterador del bloque de combinaciones que toque
 			Iterator<Combinacion> ic = llc.get(idx).iterator();
@@ -96,7 +96,7 @@ public class Tablero {
 				if (!colisiones) {
 					// si no ha colisionado con ninguno de los anteriores, se sigue en profundidad
 					res[idx] = i;
-					buscaSoluciones(llc, res, idx+1);
+					buscaSolucionesRec(llc, res, idx+1);
 				}
 			}
 		} else {
@@ -106,6 +106,66 @@ public class Tablero {
 			}
 			if (soluciones == null) {
 				soluciones = new ArrayList<List<Combinacion>>();
+			}
+			soluciones.add(lc);
+		}
+	}
+
+	/**
+	 * método recursivo para la búsqueda de soluciones mediante el método de
+	 * vuelta atrás.
+	 * @param llc montículo con lista de combinaciones por cada número.
+	 * @param res array de soluciones.
+	 * @param idx índice que indica el número que se está comprobando.
+	 */
+	private void buscaSolucionesIter( List<List<Combinacion>> llc, int[] res, int idx ) {
+		if (soluciones == null) {
+			soluciones = new ArrayList<List<Combinacion>>();
+		}
+		if (llc.size() > 0) {
+			int parada = llc.get(0).size();
+		
+			// tomamos el iterador del bloque de combinaciones que toque
+			res[idx] = 0;
+			while (res[0] < parada) {
+				boolean colisiones = false;
+				for (int j=0; j<idx && !colisiones; j++) {
+					Combinacion c = llc.get(idx).get(res[idx]);
+					Combinacion tc = llc.get(j).get(res[j]);
+					if (c.colision(tc)) {
+						colisiones = true;
+					}
+				}
+				if (!colisiones) {
+					if (idx+1 == res.length) {
+						List<Combinacion> lc = new ArrayList<Combinacion>();
+						for (int i=0; i<=idx; i++) {
+							lc.add(llc.get(i).get(res[i]));
+						}
+						soluciones.add(lc);
+						// retrocede hasta donde se pueda (poda)
+						while (idx > 0 && res[idx]+1 == llc.get(idx).size()) {
+							res[idx] = 0;
+							idx --;
+						}
+						res[idx]++;
+					} else {
+						// avanza al siguiente nodo
+						idx ++;
+					}
+				} else {
+					// retrocede hasta donde se pueda (poda)
+					while (idx > 0 && res[idx]+1 == llc.get(idx).size()) {
+						res[idx] = 0;
+						idx --;
+					}
+					res[idx]++;
+				}
+			}
+		} else {
+			List<Combinacion> lc = new ArrayList<Combinacion>();
+			for (int i=0; i<idx; i++) {
+				lc.add(llc.get(i).get(res[i]));
 			}
 			soluciones.add(lc);
 		}
