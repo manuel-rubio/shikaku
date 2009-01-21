@@ -1,0 +1,186 @@
+\documentclass[titlepage,a4paper,11pt]{report}
+\usepackage[applemac]{inputenc}
+\usepackage[spanish]{babel}
+
+\author{Manuel Angel Rubio Jiménez}
+\title{Práctica Programación III: Shikaku}
+\date{Última revisión: \today}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\chapter{Diseño del Algoritmo}
+
+\section{El Juego}
+
+\paragraph{} El problema que se pide resolver es el juego de Shikaku. 
+Este juego consta de un tablero rectangular dispuesto en modo de casillas,
+pudiendo contener cada una de ellas un número o nada.
+
+\paragraph{} El juego consiste en trazar rectángulos de área igual al número
+que se encierra dentro de ellos, no pudiendo solaparse ningún rectángulo entre
+sí. Lo cual quiere decir que un número 6, por ejemplo, pueda estar dentro
+de un rectángulo de 1x6, 2x3, 3x2 y 6x1. Además de que la disposición del
+rectángulo pueda moverse dentro del tablero, siempre y cuando el número 6 se
+encuentre en alguna de las casillas que están dentro del tablero.
+
+\section{Resolviendo los Shikakus}
+
+\paragraph{} En primera instancia, una forma rápida para resolverlo, es aplicar
+el algoritmo de \textit{vueltra atrás} (o \textit{backtracing}), con lo que,
+tomamos todas las posibles combinaciones y las vamos probando una a una hasta
+conseguir todas las posibles combinaciones. Esto nos da:
+
+\begin{verbatim}
+funcion buscaSoluciones( C, R, i )
+    si i < C.tamaño entonces
+        para j desde 1 hasta C[i].tamaño hacer
+            colsiona <- falso
+            para k desde 1 hasta i-1 hacer
+                c <- R[k]
+                si C[i][j].colisiona(C[k][c]) entonces
+                    colisiona <- verdad
+                finsi
+            finpara
+            if no colisiona entonces
+                R[i] <- j
+                buscaSoluciones( C, R, i+1 )
+            finsi
+        finpara
+    sino
+        para j desde 1 hasta i hacer
+            c <- R[i]
+            solucion.agrega(C[i][c])
+        finpara
+        soluciones.agrega(solucion)
+    finsi
+finfuncion
+\end{verbatim}
+
+\paragraph{} La ejecución del algoritmo, requiere del paso de tres 
+parámetros: C, lista de combinaciones posibles; R, lista de 
+combinaciones que se están probando; i, índice de la posición, dentro 
+de ambos vectores, de por donde vamos.
+
+\paragraph{} La idea es que C, que es un vector de listas enlazadas, 
+se diga, para cada una de las posiciones de ese vector, la 
+combinación válida dentro de la lista enlazada en concreto.
+
+\paragraph{} Este algoritmo tiene un coste de \textbf{$O(n^{2} log_{2} 
+n)$}, debido a que tiene dos bucles principales en los que se recorre el 
+vector (el primero de ellos) y la lista enlazada que esté en la posición del 
+vector en concreto (el segundo bucle de tipo para). Se produce una 
+recursión, que hace que se ejecute todo de nuevo, por lo que se llega 
+a un coste en recursividad de $log_{2} n$.
+
+\chapter{Realizando las Combinaciones}
+
+\section{Dimensiones del Bloque}
+
+\paragraph{} Uno de los primeros problemas, a la hora de realizar el algoritmo, es determinar el número de
+combinaciones que se tienen para los números encontrados en el tablero. Para saber cuántas combinaciones hay, combiene
+saber que, en el peor de los casos, pueden tener:
+
+\begin{center}
+\begin{tabular}[hbt]{cl}
+\textbf{Número} & \textbf{Combinaciones} \\
+\hline
+1 & 1 (1x1) = 1\\
+2 & 4 (2x1, 1x2) = 4\\
+3 & 6 (3x1, 1x3) = 6\\
+4 & 8 (4x1, 1x4) + 4 (2x2) = 12\\
+5 & 10 (5x1, 1x5) = 10\\
+6 & 12 (6x1, 1x6) + 12 (2x3, 3x2) = 24
+\end{tabular}
+\end{center}
+
+\paragraph{} A simple vista no se aprecia ninguna serie con la que se pueda establecer el número de combinaciones
+posibles, por lo que hay que hacer un recorrido a los posibles divisores de cada uno de los números, y ver si son
+divisibles. Para esto tenemos las siguientes opciones:
+
+\begin{itemize}
+    \item Hacer la raíz cuadrada del número del que buscar 
+    multiplicadores, y un recorrido de ese número hasta 1, inclusive, 
+    para comprobar cuales son divisibles por el número en sí.
+    \item Haciendo el recorrido directamente desde n-1 hasta 1, 
+    inclusive, haciendo todas las operaciones de módulo para comprobar 
+    si son exactas.
+\end{itemize}
+
+\paragraph{} Teniendo en cuenta de que N, según el tablero, no es 
+lógico que sea un número muy grande, es asumible que el tiempo que 
+tarde el primer algoritmo en resolver el problema, debido al coste 
+que deriva en sí de la operación de la raíz cuadrada, será más 
+costoso que un bucle simple con operaciones de módulo.
+
+\paragraph{} Por lo tanto, pasamos a implementar la segunda solución 
+del siguiente modo:
+
+\begin{verbatim}
+funcion buscaDivisores( N )
+    solucion <- 0
+    para i desde N-1 hasta 1 paso -1 hacer
+        si N mod i = 0 entonces
+            solucion <- solucion + 1
+            soluciones[solucion] <- N + ``x'' + i
+            solucion <- solucion + 1
+            soluciones[solucion] <- i + ``x'' + N
+        finsi
+    finpara
+finfuncion
+\end{verbatim}
+
+\section{Combinaciones}
+
+\paragraph{} Para tomar las distintas combinaciones que se pueden 
+formar con las dimensiones halladas en el apartado anterior, hay que 
+tener en cuenta que una de las posibles dimensiones anteriores, en 
+4x4, podría estar en cualquier celda del bloque formado, por lo que, 
+habrá que recorrer las celdas de cada uno de los bloques formados 
+para tomar las posibles posiciones de ese bloque en el tablero.
+
+\subsection{Primera Poda: Nada fuera del tablero}
+
+\paragraph{} Para descartar combinaciones de forma rápida, tomaremos 
+que, cuando una celda de una combinación específica esté posicionada 
+en una coordenada negativa, ya sea del eje X o del eje Y, así como 
+que se encuentre fuera de los límites positivos permitidos (el tamaño 
+del tablero), esa combinación será descartada.
+
+\subsection{Segunda Poda: Combinaciones con solo un número}
+
+\paragraph{} Podar lo suficiente el número de combinaciones posibles 
+es algo que es rápido hacer a través de algoritmos voraces, por lo 
+que, aplicar estos principios para hacer una segunda criba es 
+importante.
+
+\paragraph{} En este caso, lo que se hará es depositar en una lista 
+los números que se han encontrado en el tablero. Cuando una 
+combinación generada de un bloque tenga una celda en su conjunto en 
+la que esté un número que no sea el que la motivó, esa combinación 
+será descartada.
+
+\subsection{Tercera Poda: Combinaciones más probables}
+
+\paragraph{} Ejecutando el código base con los algoritmos voraces 
+anteriores, no resulta suficiente, puesto que aún quedan muchas 
+combinaciones por comprobar. He aquí, que hacemos otra posible criba.
+
+\paragraph{} Esta reducción constará de tomar cada una de las piezas 
+y comprobar con las siguientes combinaciones del resto de piezas a 
+modo de que, si esa la combinación tomada en primer lugar 
+``colisiona'' con todas las combinaciones posibles de otro número, se 
+descarta por imposible.
+
+\section{Conclusiones}
+
+\paragraph{} Cuando se ejecutan los algoritmos voraces de poda, se 
+consigue una reducción drástica en el tiempo de ejecución del 
+algoritmo principal de resolución. En muchos casos de prueba, incluso 
+no ha hecho falta realizar el algoritmo y, sobre todo, cuando solo 
+hay una solución posible para el tablero de shikaku.
+
+\end{document}
