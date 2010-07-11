@@ -35,15 +35,15 @@ public class shikaku {
 
 	private static String help() {
 		return
-				"Shikaku\n" +
-				"Manuel Rubio\n" +
-				"\n" +
-				"Sintaxis: java shikaku [-h] [-d] [fichero]\n" +
-				"\n" +
-				"Opciones:\n" +
-				"\t-h      muestra esta ayuda.\n" +
-				"\t-d      opción de depuración (más mensajes sobre la salida.\n" +
-				"\tfichero analiza un fichero de tablero y sus soluciones.\n";
+			"Shikaku\n" +
+			"Manuel Rubio\n" +
+			"\n" +
+			"Sintaxis: java shikaku [-h] [-d] [fichero]\n" +
+			"\n" +
+			"Opciones:\n" +
+			"\t-h      muestra esta ayuda.\n" +
+			"\t-d      opción de depuración (más mensajes sobre la salida.\n" +
+			"\tfichero analiza un fichero de tablero y sus soluciones.\n";
 	}
 	
 	/**

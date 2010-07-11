@@ -92,10 +92,11 @@ public class Ordenada {
 	 * @return cadena de texto.
 	 */
 	public String toString() {
+		String retorno = "(" + x + "," + y + ")";
 		if (this.n > 0) {
-			return "(" + x + "," + y + ")" + "[" + n + "]";
+			return retorno + "[" + n + "]";
 		}
-		return "(" + x + "," + y + ")";
+		return retorno;
 	}
 	
 	/**
