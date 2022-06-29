@@ -1,4 +1,5 @@
-# Shikaku Solver 1.0-voraz
+Shikaku Solver 1.0-voraz
+========================
 
 para ejecutar el programa, se debe de tener instalado:
 
